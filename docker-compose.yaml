@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: nest_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/trakto
+      - RABBITMQ_URI=amqp://rabbitmq
+      - IMAGE_STORAGE_PATH=/uploads
+    volumes:
+      - ./uploads:/uploads
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: image_worker
+    restart: unless-stopped
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/trakto
+      - RABBITMQ_URI=amqp://rabbitmq
+      - IMAGE_STORAGE_PATH=/uploads
+    volumes:
+      - ./uploads:/uploads
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672" # painel de gerenciamento
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+volumes:
+  mongo_data:

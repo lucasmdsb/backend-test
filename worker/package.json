@@ -1,0 +1,24 @@
+{
+    "name": "trakto-worker",
+    "version": "1.0.0",
+    "description": "Worker para processamento de imagens - Trakto",
+    "main": "src/worker.ts",
+    "scripts": {
+        "start": "npx ts-node src/worker.ts",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "amqplib": "^0.10.3",
+        "mongodb": "^6.0.0",
+        "sharp": "^0.32.0",
+        "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+        "@types/amqplib": "^0.10.7",
+        "@types/node": "^20.0.0",
+        "@types/sharp": "^0.32.0",
+        "@types/uuid": "^10.0.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    }
+}
