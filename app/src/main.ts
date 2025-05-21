@@ -1,19 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import 'reflect-metadata';
+import { UploadController } from './modules/upload/upload.controller';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const uploadPath = process.env.IMAGE_STORAGE_PATH || './uploads';
-  if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-  }
-
   app.useGlobalPipes(new ValidationPipe());
+
+  const config = new DocumentBuilder()
+    .setTitle('Trakto Image API')
+    .setDescription('API para upload e otimização de imagens')
+    .setVersion('1.0')
+    .build();
+
+    const document = SwaggerModule.createDocument(app, config, {
+      include: [UploadController],
+    });
+
+  SwaggerModule.setup('/api', app, document);
+
   await app.listen(3000);
-  console.log('App rodando na porta 3000');
+  console.log('API rodando em http://localhost:3000');
+  console.log('Swagger em http://localhost:3000/api');
 }
 bootstrap();

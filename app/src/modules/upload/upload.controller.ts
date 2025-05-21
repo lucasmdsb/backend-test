@@ -10,12 +10,26 @@ import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 import { diskStorage } from 'multer';
+import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
+@ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: process.env.IMAGE_STORAGE_PATH || './uploads',
@@ -25,14 +39,13 @@ export class UploadController {
     const taskId = uuidv4();
     const ext = path.extname(file.originalname);
     const storagePath = process.env.IMAGE_STORAGE_PATH || './uploads';
-
+  
     const originalPath = file.path;
     const finalPath = path.join(storagePath, `${taskId}-original${ext}`);
-
     fs.renameSync(originalPath, finalPath);
-
+  
     await this.uploadService.enqueueTask(taskId, file.originalname, ext);
-    
+  
     return { taskId, status: 'PENDING' };
   }
 }

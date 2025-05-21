@@ -35,6 +35,7 @@ async function startWorker() {
         const outputPath = path.join(IMAGE_STORAGE_PATH, `${taskId}-optimized.jpg`);
 
         await sharp(inputPath).resize(800).jpeg({ quality: 80 }).toFile(outputPath);
+        await sharp(inputPath).resize(800).webp({ quality: 80 }).toFile(path.join(IMAGE_STORAGE_PATH, `${taskId}-optimized.webp`));
 
         await tasks.updateOne(
           { taskId },
@@ -43,9 +44,12 @@ async function startWorker() {
 
         console.log(`[✓] Task ${taskId} finalizada`);
         channel.ack(msg);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao processar:', error);
-        if (msg) channel.nack(msg, false, false);
+        if (msg) {
+          const isRetryable = error?.code === 'ECONNREFUSED' || error?.message?.includes('timeout');
+          channel.nack(msg, false, isRetryable);
+        }
       }
     },
     { noAck: false }
