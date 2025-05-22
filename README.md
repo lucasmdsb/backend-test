@@ -37,19 +37,12 @@ git clone <repo>
 cd backend-test
 ```
 
-### 2. Crie um arquivo `.env` (opcional)
-```env
-RABBITMQ_URI=amqp://localhost
-MONGO_URI=mongodb://localhost:27017/trakto
-IMAGE_STORAGE_PATH=./uploads
-```
-
-### 3. Suba os containers
+### 2. Suba os containers
 ```bash
 docker-compose up --build
 ```
 
-### 4. Acesse a API
+### 3. Acesse a API
 - Upload: `POST /upload` (form-data com chave `file`)
 - Status: `GET /status/:taskId`
 
