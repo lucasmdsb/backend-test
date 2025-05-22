@@ -67,6 +67,7 @@ Substitua `<task_id>` pelo ID retornado no upload.
 ## Execução de testes
 
 ```bash
+cd app/
 npm install
 npm run test:e2e
 ```
